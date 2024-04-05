@@ -189,14 +189,14 @@
 
                 <div class="mb-4 flex align-items-center">
                     <label for="dueDate" class="block w-1/2 font-semibold mb-1">Event Date<span
-                        style="color: red;">*</span></label>
+                            style="color: red;">*</span></label>
                     <input type="date" id="due_date" name="dueDate"
                         class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
                 </div>
 
                 <div class="mb-4 flex align-items-center">
                     <label for="dueDate" class="block w-1/2 font-semibold mb-1">Event Time<span
-                        style="color: red;">*</span></label>
+                            style="color: red;">*</span></label>
                     <input type="time" id="due_time" name="dueTime"
                         class="block w-1/2 border border-gray-300 rounded-md px-4 py-2" value="12:00">
                 </div>
@@ -235,16 +235,18 @@
                 </div>
 
 
-                <form id="contactForm" action="submit_url" method="POST">
-                    <div class="mb-4 flex align-items-center flex justify-end">
-                        <button type="submit"
-                            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
-                            style="background-color:#df3333;" id="submit" onclick="createJob()">Submit</button>
-                    </div>
-                </form>
-                <div class="w-full justify-end flex bg-red-50 text-red-700 p-2 rounded-lg gap-2 hidden" id="finalError"><div>Error - mandatory field missing</div> <div class="material-symbols-rounded">
+                <div class="mb-4 flex align-items-center flex justify-end">
+                    <button
+                        class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                        style="background-color:#df3333;" id="submit" onclick="createJob()">Submit</button>
+                </div>
+            </form>
+            <div class="w-full justify-end flex bg-red-50 text-red-700 p-2 rounded-lg gap-2 hidden" id="finalError">
+                <div>Error - mandatory field missing</div>
+                <div class="material-symbols-rounded">
                     error
-                </div></div>
+                </div>
+            </div>
         </div>
     </div>
     </div>
