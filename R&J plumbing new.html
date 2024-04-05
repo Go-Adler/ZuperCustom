@@ -1,0 +1,256 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Appointment Booking Widget</title>
+
+    <!-- links -->
+    <link href="https://cdn.jsdelivr.net/npm/@uvarov.frontend/vanilla-calendar@1.3.2/vanilla-calendar.min.css"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tailwindcss/ui@latest/dist/tailwind-ui.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/ionicons/2.0.1/css/ionicons.min.css"
+        integrity="sha512-JApjWRnfonFeGBY7t4yq8SWr1A6xVYEJgO/UMIYONxaR3C9GETKUg0LharbJncEzJF5Nmiv+Pr5QNulr81LjGQ=="
+        crossorigin="anonymous">
+
+    <!-- style -->
+    <style>
+        .material-symbols-rounded {
+            font-variation-settings:
+                'FILL' 0,
+                'wght' 400,
+                'GRAD' 0,
+                'opsz' 24
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #calendar {
+            padding: 25px;
+            border-right: 1px solid #e9e9e9;
+        }
+
+        .vanilla-calendar-day {
+            width: 20px;
+            height: 40px;
+            font-size: 14px;
+        }
+
+        .vanilla-calendar-header {
+            margin-bottom: 20px;
+        }
+
+        #loader {
+            /* border: 7px solid #f3f3f3; */
+            border-radius: 50%;
+            border-top: 7px solid #df3333;
+            width: 50px;
+            height: 50px;
+            animation: spin 1.7s linear infinite;
+            display: none;
+        }
+
+        .center {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            margin: auto;
+        }
+
+        .visually-hidden {
+            visibility: hidden
+        }
+
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .header {
+            border-radius: 5px;
+        }
+
+        .low-head {
+            padding: 10px 20px;
+        }
+    </style>
+
+    <!-- scripts / cdns -->
+    <script
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAFxpo4hifPI3ML96cewEmzH3e_ErPClXc&libraries=places"></script>
+
+    <script src="https://kit.fontawesome.com/14bc4b0fca.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/parse-address@1.1.2/parse-address.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.43/moment-timezone-with-data-1970-2030.min.js"
+        integrity="sha512-ae875b70oSplY0gKnsUZyoB0F2ywdOn3pSKP5dBV6ZdBmtr5D54VYKXbMamjnGNA1IpvyF6v0tHuQUZv6rtiAw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+</head>
+
+<body id="bodyData" style="background-color: #fff1d0;">
+    <div id="loader" class="center"></div>
+
+    <!-- Toast -->
+    <div id="toast-save" class="toast p-3 mb-2 bg-light text-dark" role="alert" aria-live="assertive"
+        style="position: absolute;min-width: 245px; border-left:4px solid #43b030; top:20px; right:0" data-delay="3000"
+        aria-atomic="true">
+        <div class="toast-body" style="color: #40b242; font-size: 20px; font-weight: 600; padding: 0;">
+            Job created succesfully.
+        </div>
+        <div id="toast-slot" class="toast p-3 mb-2 bg-light text-dark" role="alert" aria-live="assertive"
+            style="position: absolute;min-width: 245px; border-left:4px solid #df3333; top:20px; right:0"
+            data-delay="3000" aria-atomic="true">
+            <div class="toast-body" style="color: #df3333; font-size: 20px; font-weight: 600; padding: 0;">
+                Please select a slot!
+            </div>
+        </div>
+        <div>
+        </div>
+    </div>
+
+
+    <div id="job-form" class="py-2 pt-12 mt-8 mb-16">
+        <div class="w-3/5 shadow overflow-hidden  bg-white sm:rounded-lg mx-auto px-4 py-8">
+            <h3 class="text-lg leading-6 font-medium text-gray-900 underline flex justify-center mb-12">Create Job</h3>
+            <form id="form">
+                <div class="mb-4 flex align-items-center">
+                    <label for="email" class="block w-1/2 font-semibold mb-1">Email<span
+                            style="color: red;">*</span></label>
+                    <div class="block w-1/2 flex flex-col">
+                        <input type="email" id="email" name="email"
+                            class="border w-full border-gray-300 rounded-md px-4 py-2 req" required>
+                        <div class="text-sm text-red-700 px-4 mt-2 rounded-lg py-1 d-none bg-red-50 flex gap-2 aling-items-end"
+                            id="invalidEmail">
+                            <div class="material-symbols-rounded">
+                                error
+                            </div>
+                            <div>Invalid email</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4 flex align-items-center">
+                    <label for="firstName" class="block w-1/2 font-semibold mb-1">First Name<span
+                            style="color: red;">*</span></label>
+                    <input type="text" id="first_name" name="firstName"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2 req" required>
+                </div>
+                <div class="mb-4 flex align-items-center">
+                    <label for="lastName" class="block w-1/2 font-semibold mb-1">Last Name</label>
+                    <input type="text" id="last_name" name="lastName"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
+                </div>
+
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="phone" class="block w-1/2 font-semibold mb-1">Phone Number<span
+                            style="color: red;">*</span></label>
+                    <input type="tel" id="phone_no" name="phone"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2 req" required>
+                </div>
+
+                <div class="mb-4 flex align-items-center">
+                    <label for="category" class="block w-1/2 font-semibold mb-1">Event category<span
+                            style="color: red;">*</span></label>
+                    <select id="category" name="category"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2 req" required>
+                    </select>
+                </div>
+
+                <div class="mb-4 flex align-items-start">
+                    <label for="description" class="block w-1/2 font-semibold mb-1">Description<span
+                            style="color: red;">*</span></label>
+                    <textarea id="description" name="description" rows="4"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2 req" required></textarea>
+                </div>
+
+                <div class="mb-4 flex align-items-center">
+                    <label for="dueDate" class="block w-1/2 font-semibold mb-1">Event Date<span
+                        style="color: red;">*</span></label>
+                    <input type="date" id="due_date" name="dueDate"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
+                </div>
+
+                <div class="mb-4 flex align-items-center">
+                    <label for="dueDate" class="block w-1/2 font-semibold mb-1">Event Time<span
+                        style="color: red;">*</span></label>
+                    <input type="time" id="due_time" name="dueTime"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2" value="12:00">
+                </div>
+
+
+                <div id="map-container"></div>
+
+
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="streetAddress" class="block w-1/2 font-semibold mb-1">Street Address<span
+                            style="color: red;">*</span></label>
+                    <input type="text" id="street_address" name="streetAddress"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2 req" required>
+                </div>
+
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="city" class="block w-1/2 font-semibold mb-1">City<span
+                            style="color: red;">*</span></label>
+                    <input type="text" id="city" name="city"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2" required>
+                </div>
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="stateProvince" class="block w-1/2 font-semibold mb-1">State / Province</label>
+                    <input type="text" id="state_province" name="stateProvince"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
+                </div>
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="country" class="block w-1/2 font-semibold mb-1">Country</label>
+                    <input type="text" id="country" name="country"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
+                </div>
+                <div class="mb-4 flex align-items-center hidden">
+                    <label for="zipcode" class="block w-1/2 font-semibold mb-1">Zipcode</label>
+                    <input type="text" id="zipcode" name="zipcode"
+                        class="block w-1/2 border border-gray-300 rounded-md px-4 py-2">
+                </div>
+
+
+                <form id="contactForm" action="submit_url" method="POST">
+                    <div class="mb-4 flex align-items-center flex justify-end">
+                        <button type="submit"
+                            class="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+                            style="background-color:#df3333;" id="submit" onclick="createJob()">Submit</button>
+                    </div>
+                </form>
+                <div class="w-full justify-end flex bg-red-50 text-red-700 p-2 rounded-lg gap-2 hidden" id="finalError"><div>Error - mandatory field missing</div> <div class="material-symbols-rounded">
+                    error
+                </div></div>
+        </div>
+    </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/@uvarov.frontend/vanilla-calendar@1.3.2/vanilla-calendar.min.js"></script>
+    <script src="./some.js"> </script>
+
+</body>
+
+</html>
